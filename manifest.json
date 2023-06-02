@@ -1,0 +1,50 @@
+{
+  "manifest_version": 2,
+  "name": "Org Capture",
+  "version": "0.1.0",
+  "applications": {
+    "gecko": {
+      "id": "org-capture@stebalien.com"
+    }
+  },
+  "author": "Steven Allen",
+  "description": "A web-extension for capturing pages/media with org-capture.",
+  "homepage_url": "https://github.com/Stebalien/org-capture-extension",
+
+  "background": {
+    "persistent": false,
+    "scripts": ["settings.js", "background.js"]
+  },
+
+  "permissions": ["activeTab", "storage", "scripting", "menus", "downloads", "cookies"],
+
+  "options_ui": {
+    "page": "options.html"
+  },
+
+  "browser_action": {
+    "default_icon": "emacs.svg"
+  },
+
+  "icons": {
+    "48": "emacs.svg",
+    "96": "emacs.svg"
+  },
+
+  "commands": {
+    "capture": {
+      "description": "Capture current page with org-capture",
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      }
+    },
+    "store": {
+      "description": "Store a link to the current page",
+      "suggested_key": {
+        "default": "Ctrl+Shift+L",
+        "mac": "Command+Shift+L"
+      }
+    }
+  }
+}

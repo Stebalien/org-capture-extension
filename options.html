@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Org Capture Settings</title>
+    </head>
+
+    <body>
+        <form id="options">
+            <table>
+                <tr>
+                    <td>
+                        Default capture option
+                    </td>
+                    <td>
+                        <select name="defaultAction">
+                            <option value="capture">Capture</option>
+                            <option value="store">Store Link</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Template for selection capture
+                    </td>
+                    <td>
+                        <input name="selectionTemplate" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Template for link capture
+                    </td>
+                    <td>
+                        <input name="linkTemplate">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Template for media capture
+                    </td>
+                    <td>
+                        <input name="mediaTemplate">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Download media on capture?
+                    </td>
+                    <td>
+                        <input name="downloadMedia" type="checkbox" />
+                    </td>
+                </tr>
+            </table>
+            <button type="submit">Save</button>
+            <button type="reset">Revert</button>
+        </form>
+
+        <script src="settings.js"></script>
+        <script src="options.js"></script>
+    </body>
+</html>

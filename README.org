@@ -1,0 +1,13 @@
+#+TITLE:Org Capture (WebExt)
+
+This is a web-extension for capturing links, quotes, media, pages, etc. with [[https://orgmode.org/worg/org-contrib/org-protocol.html][org-protocol]]. It supports:
+
+1. Hotkeys. One for storing links, one for capturing.
+2. Capturing pages, selected text, and even media (via the context menu).
+
+Importantly, this extension supports automatically downloading said media before capturing it.
+
+
+* History
+
+Heavily inspired by both [[https://github.com/sprig/org-capture-extension][Org Capture Extension]] and [[https://github.com/vifon/org-protocol-for-firefox][Org Protocol for Firefox]]. However, the former [[https://github.com/sprig/org-capture-extension/issues/80][required permission]] for every new page captured and the latter wasn't very customizable and required manual clicks to complete a capture.
