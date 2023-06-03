@@ -7,6 +7,20 @@ This is a web-extension for capturing links, quotes, media, pages, etc. with [[h
 
 Importantly, this extension supports automatically downloading said media before capturing it.
 
+* Building & Installing
+
+This addon currently only supports Firefox and derivatives. I'm happy to accept patches that support other browsers, but I likely won't do much testing and things may break.
+
+To build, run  ~make build~. You'll need the ~zip~ command.
+
+Before installing, you'll need to either sign the extension, install a version of Firefox that doesn't mandate addon signature validation, or [[https://github.com/Stebalien/firefox-tweak][hack your Firefox install]]. Personally, I'd recommend the second option ([[https://librewolf.net/][LibreWolf]] works great!) then disable ~xpinstall.signatures.required~ in [[about:config]].
+
+* Signing & Distribution
+
+For addon distribution, there are ~make build-webext~ and ~make sign-webext~ commands. However, these require API keys and we're at the mercy of our Mozilla overlords on when addons actually get signed. So...
+
+1. I'm not going to list it on the store (for now).
+2. Signed versions will ship when they ship, likely never.
 
 * History
 
