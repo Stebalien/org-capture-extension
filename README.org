@@ -1,11 +1,24 @@
 #+TITLE:Org Capture (WebExt)
 
-This is a web-extension for capturing links, quotes, media, pages, etc. with [[https://orgmode.org/worg/org-contrib/org-protocol.html][org-protocol]]. It supports:
+This is a web-extension for capturing links, quotes, media, pages, etc. with [[https://orgmode.org/worg/org-contrib/org-protocol.html][org-protocol]].
 
-1. Hotkeys. One for storing links, one for capturing.
-2. Capturing pages, selected text, and even media (via the context menu).
+* Features
 
-Importantly, this extension supports automatically downloading said media before capturing it.
+1. [[https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox][Hotkeys]]. One for storing links, one for capturing the page (or selected text, if the selection is active).
+2. Context menu items for capturing:
+   - The current page.
+   - Selected text.
+   - Media (images, video, etc.). Media can be (optionally) downloaded (through your browser's download manager) before capturing.
+3. A browser action button to perform some default action on click (can either store a link to the current page, or initiate a capture).
+
+* Contributing & Bug Reports
+
+This is a /forks welcome/ project. I'm open to feedback and fixes, but I built it because I needed it and don't intend on putting any real effort/time into it. This means:
+
+- Forks are _VERY MUCH_ welcome, even encouraged. I don't want to maintain this addon, I just built it because I didn't like the existing ones.
+- If a patch/issue would require any amount of work/maintenance on my part to land, I'll likely just close it. Please don't take this as commentary on your code and feel free to fork.
+- Do file bug reports, but please keep your expecations low.
+- You _can_ file feature requests; I'm always interested in new ideas. But don't disappointed if I close them without much discussion beyond a quick "no thanks"/"not interested".
 
 * Building & Installing
 
