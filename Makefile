@@ -1,7 +1,12 @@
-WEBEXT = web-ext --artifacts-dir build --ignore-files Makefile README.org
+sources := $(wildcard *.svg *.png *.js *.css *.json *.html)
 
-build: *.svg *.xpi *.png *.js *.css *.json *.html
-	$(WEBEXT) build
+export WEB_EXT_IGNORE_FILES := $(filter-out $(sources),$(wildcard *))
+export WEB_EXT_ARTIFACTS_DIR := build
 
-sign: *.svg *.xpi *.png *.js *.css *.json *.html
-	$(WEBEXT) sign
+build: $(sources)
+	web-ext build --ignore-files $(WEB_EXT_IGNORE_FILES)
+
+sign: $(sources)
+	web-ext sign --ignore-files $(WEB_EXT_IGNORE_FILES)
+
+.PHONY: build sign
