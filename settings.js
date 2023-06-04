@@ -1,7 +1,11 @@
 const DEFAULTS = {
-  selectionTemplate: "s",
-  mediaTemplate: "m",
-  linkTemplate: "l",
+  captureHtml: false,
+  selectionCaptureTemplate: "s",
+  selectionCaptureProtocol: "capture",
+  mediaCaptureTemplate: "m",
+  mediaCaptureProtocol: "capture",
+  linkCaptureTemplate: "l",
+  linkCaptureProtocol: "capture",
   defaultAction: "store",
   downloadMedia: true,
 };
@@ -11,11 +15,10 @@ async function getSetting(key) {
   return result;
 }
 
-async function loadSettings() {
-  return browser.storage.sync.get(DEFAULTS);
+async function setSetting(key, value) {
+  return browser.storage.sync.set({ [key]: value });
 }
 
-
-async function storeSettings(settings) {
-  return browser.storage.sync.set(settings);
+async function clearSetting(key) {
+  return browser.storage.sync.remove(key);
 }

@@ -1,0 +1,9 @@
+* {
+    margin: 2px;
+}
+tbody th {
+    text-align: right;
+}
+thead th {
+    text-align: left;
+}

@@ -7,9 +7,10 @@ This is a web-extension for capturing links, quotes, media, pages, etc. with [[h
 1. [[https://support.mozilla.org/en-US/kb/manage-extension-shortcuts-firefox][Hotkeys]]. One for storing links, one for capturing the page (or selected text, if the selection is active).
 2. Context menu items for capturing:
    - The current page.
-   - Selected text.
+   - Selected text. Optionally, selections can be captured as HTML. You'll want to use this with something like [[https://github.com/alphapapa/org-protocol-capture-html][org-protocol-capture-html]] to translate the HTML to org mode.
    - Media (images, video, etc.). Media can be (optionally) downloaded (through your browser's download manager) before capturing.
 3. A browser action button to perform some default action on click (can either store a link to the current page, or initiate a capture).
+4. Optionally, capturing a selection will capture the HTML itself. You'll want to use this with something like [[https://github.com/alphapapa/org-protocol-capture-html][org-protocol-capture-html]] to translate the HTML to org mode.
 
 * Contributing & Bug Reports
 

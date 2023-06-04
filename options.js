@@ -1,34 +1,33 @@
-async function loadOptions(form) {
-  const settings = await loadSettings();
+window.addEventListener("DOMContentLoaded", async (_event) => {
+  const form = document.getElementById('options');
+
+  form.addEventListener('input', function(event) {
+    const key = event.target.name;
+    if (!key) {
+      return;
+    }
+    if (event.target.type === 'checkbox') {
+      setSetting(key, event.target.checked);
+    } else if (event.target.value === "") {
+      clearSetting(key);
+    } else {
+      setSetting(key, event.target.value);
+    }
+  });
+
+  const settings = await browser.storage.sync.get(
+    Object.fromEntries(Object.keys(DEFAULTS).map((k) => [k, undefined])),
+  );
 
   for (const [key, value] of Object.entries(settings)) {
     const element = form.elements[key];
     if (element.type == 'checkbox') {
-      element.checked = value;
+      element.checked = value ?? DEFAULTS[key];
     } else {
-      element.value = value;
+      element.placeholder = DEFAULTS[key];
+      if (value != null) {
+        element.value = value;
+      }
     }
   }
-}
-
-async function storeOptions(form) {
-  const newSettings = Array.from(form.elements)
-    .filter((el) => el.name)
-    .map((el) => [el.name, el.type === 'checkbox' ? el.checked : el.value]);
-  return storeSettings(Object.fromEntries(newSettings));
-}
-
-window.addEventListener("DOMContentLoaded", (_event) => {
-  const form = document.getElementById('options');
-
-  form.addEventListener('reset', function(_event) {
-    loadOptions(this);
-  });
-
-  form.addEventListener('submit', function(event) {
-    event.preventDefault();
-    storeOptions(this);
-  });
-
-  loadOptions(form);
 });

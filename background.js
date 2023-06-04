@@ -3,18 +3,55 @@ const icons = {
   "32": "emacs.svg"
 };
 
-async function getSelection(tab) {
+async function getSelection(tab, html) {
   const [{ result, error }] = await browser.scripting.executeScript({
     target: {
       tabId: tab.id,
     },
-    func: () => {
+    args: [html],
+    func: (html) => {
       const selection = document.getSelection();
       if (selection?.isCollapsed) {
         return null;
-      } else {
+      }
+      if (!html) {
         return selection.toString();
       }
+
+      // The following has been adapted (and heavily modified) from
+      // https://github.com/alphapapa/org-protocol-capture-html
+
+      // Copy out the selection.
+      const container = document.createElement("div");
+      for (let i = 0, len = selection.rangeCount; i < len; ++i) {
+        container.appendChild(selection.getRangeAt(i).cloneContents());
+      }
+
+      // Remove invisible elements.
+      for (const element of container.getElementsByTagName('*')) {
+        if (window.getComputedStyle(element).display === 'none') {
+          element.remove();
+        }
+      }
+
+      // Make links absolute.
+      var elementTypes = [
+        ["a", "href"],
+        ["source", "src"],
+        ["video", "src"],
+        ["audio", "src"],
+        ["picture", "src"],
+        ["img", "src"],
+      ];
+      for (const [tag, attr] of elementTypes) {
+        for (const element of container.getElementsByTagName(tag)) {
+          element.setAttribute(
+            attr,
+            new URL(element.getAttribute(attr), document.baseURI),
+          );
+        }
+      }
+      return container.innerHTML;
     }
   });
   if (error) {
@@ -24,13 +61,15 @@ async function getSelection(tab) {
   }
 }
 
-async function capture(template, url, title, selection) {
+async function capture(which, url, title, selection) {
+  const template = await getSetting(`${which}CaptureTemplate`);
+  const protocol = await getSetting(`${which}CaptureProtocol`);
   let data = { url, title, template };
   if (selection) {
     data.body = selection;
   }
   await browser.tabs.update({
-    url: `org-protocol://capture?${new URLSearchParams(data)}`,
+    url: `org-protocol://${protocol}?${new URLSearchParams(data)}`,
   });
 }
 
@@ -42,9 +81,10 @@ async function storeLink(url, title) {
 }
 
 async function autoCapture(tab) {
-  const selection = await getSelection(tab);
-  const tmpl = await getSetting(selection ? "selectionTemplate" : "linkTemplate");
-  return capture(tmpl, tab.url, tab.title, selection);
+  const html = await getSetting("captureHtml");
+  const selection = await getSelection(tab, html);
+  const which = selection ? "selection" : "link";
+  return capture(which, tab.url, tab.title, selection);
 }
 
 browser.browserAction.onClicked.addListener(async (tab) => {
@@ -93,18 +133,17 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       await storeLink(tab.url, tab.title);
       return;
     case "capture-selection":
-      const selectionTemplate = await getSetting("selectionTemplate");
-      await capture(selectionTemplate, tab.url, tab.title, info.selectionText);
+      const html = await getSetting("captureHtml");
+      const selection = html ? await getSelection(tab, html) : info.selectionText;
+      await capture("selection", tab.url, tab.title, selection, html);
       return;
     case "capture-link":
-      const linkTemplate = await getSetting("linkTemplate");
-      await capture(linkTemplate, tab.url, tab.title);
+      await capture("link", tab.url, tab.title);
       return;
     case "capture-media":
       const downloadMedia = await getSetting("downloadMedia");
       if (!downloadMedia) {
-        const mediaTemplate = await getSetting("mediaTemplate");
-        await capture(mediaTemplate, tab.url, tab.title, info.srcUrl);
+        await capture("media", tab.url, tab.title, info.srcUrl);
         return;
       }
       await browser.storage.local.set({
@@ -157,8 +196,7 @@ browser.downloads.onChanged.addListener(async (change) => {
     return;
   }
 
-  const mediaTemplate = await getSetting("mediaTemplate");
-  await capture(mediaTemplate, metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
+  await capture("media", metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
   await browser.storage.local.remove(key);
 });
 
@@ -172,8 +210,7 @@ browser.downloads.onChanged.addListener(async (change) => {
         return;
       }
       if (dl.state == "complete") {
-        const mediaTemplate = await getSetting("mediaTemplate");
-        await capture(mediaTemplate, metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
+        await capture("media", metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
         await browser.storage.local.remove(k);
       }
     });
