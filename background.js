@@ -3,6 +3,32 @@ const icons = {
   "32": "emacs.svg"
 };
 
+
+
+async function getDescription(tab) {
+  const [{ result, error }] = await browser.scripting.executeScript({
+    target: {
+      tabId: tab.id,
+    },
+    func: () => {
+      const descriptionQuery = 'meta[name="description"], meta[property="og:description"], meta[name="twitter:description"]';
+      const description = document.head.querySelector(descriptionQuery)?.getAttribute('content');
+      if (!description) {
+        return null;
+      }
+      const container = document.createElement("div");
+      container.innerHTML = description;
+      const text = container.innerText.trim();
+      return text.length > 0 ? text : null;
+    }
+  });
+  if (error) {
+    throw error;
+  } else {
+    return result;
+  }
+}
+
 async function getSelection(tab, html) {
   const [{ result, error }] = await browser.scripting.executeScript({
     target: {
@@ -82,9 +108,13 @@ async function storeLink(url, title) {
 
 async function autoCapture(tab) {
   const html = await getSetting("captureHtml");
-  const selection = await getSelection(tab, html);
-  const which = selection ? "selection" : "link";
-  return capture(which, tab.url, tab.title, selection);
+  let body = await getSelection(tab, html);
+  let which = "selection";
+  if (!body) {
+    which = "link";
+    body = await getDescription(tab);
+  }
+  return capture(which, tab.url, tab.title, body);
 }
 
 browser.browserAction.onClicked.addListener(async (tab) => {
@@ -138,7 +168,8 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       await capture("selection", tab.url, tab.title, selection, html);
       return;
     case "capture-link":
-      await capture("link", tab.url, tab.title);
+      const description = await getDescription(tab);
+      await capture("link", tab.url, tab.title, description);
       return;
     case "capture-media":
       const downloadMedia = await getSetting("downloadMedia");
