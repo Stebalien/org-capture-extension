@@ -21,9 +21,15 @@ This is a /forks welcome/ project. I'm open to feedback and fixes, but I built i
 - Do file bug reports, but please keep your expecations low.
 - You _can_ file feature requests; I'm always interested in new ideas. But don't disappointed if I close them without much discussion beyond a quick "no thanks"/"not interested".
 
-* Building & Installing
+* Supported Browsers
 
-This addon currently only supports Firefox and derivatives. I'm happy to accept patches that support other browsers, but I likely won't do much testing and things may break.
+At the moment, only the latest version of Firefox is supported. I'm happy to accept patches for other browsers, but I likely won't do much testing.
+
+* Installing
+
+Either build it locally or install the latest [[https://github.com/Stebalien/org-capture-extension/releases/][release]]. This addon isn't listed on the Mozilla store and doesn't auto-update. For now, you'll have to install/update manually.
+
+* Building
 
 To build, run  ~make build~. You'll need the ~zip~ command.
 
@@ -31,10 +37,7 @@ Before installing, you'll need to either sign the extension, install a version o
 
 * Signing & Distribution
 
-For addon distribution, there are ~make build-webext~ and ~make sign-webext~ commands. However, these require API keys and we're at the mercy of our Mozilla overlords on when addons actually get signed. So...
-
-1. I'm not going to list it on the store (for now).
-2. Signed versions will ship when they ship, likely never.
+For addon distribution, use ~make build-webext~ and ~make sign-webext~. However, these require API keys and we're at the mercy of our Mozilla overlords on when addons actually get signed.
 
 * History
 
