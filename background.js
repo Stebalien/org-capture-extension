@@ -146,13 +146,27 @@ browser.menus.create({
 browser.menus.create({
   id: "store-link",
   title: "Store Link",
-  contexts: ["page", "tab"],
+  contexts: ["link"],
   icons: icons,
 });
 
 browser.menus.create({
   id: "capture-link",
   title: "Capture Link",
+  contexts: ["link"],
+  icons: icons,
+});
+
+browser.menus.create({
+  id: "store-page-link",
+  title: "Store Page Link",
+  contexts: ["page", "tab"],
+  icons: icons,
+});
+
+browser.menus.create({
+  id: "capture-page-link",
+  title: "Capture Page Link",
   contexts: ["page", "tab"],
   icons: icons,
 });
@@ -160,6 +174,9 @@ browser.menus.create({
 browser.menus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "store-link":
+      await storeLink(info.linkUrl, info.linkText);
+      return;
+    case "store-page-link":
       await storeLink(tab.url, tab.title);
       return;
     case "capture-selection":
@@ -168,6 +185,9 @@ browser.menus.onClicked.addListener(async (info, tab) => {
       await capture("selection", tab.url, tab.title, selection, html);
       return;
     case "capture-link":
+      await capture("link", info.linkUrl, info.linkText, null);
+      return;
+    case "capture-page-link":
       const description = await getDescription(tab);
       await capture("link", tab.url, tab.title, description);
       return;
