@@ -1,12 +1,7 @@
-const icons = {
-  "16": "emacs.svg",
-  "32": "emacs.svg"
-};
-
-
+import { getSetting } from "./settings.js";
 
 async function getDescription(tab) {
-  const [{ result, error }] = await browser.scripting.executeScript({
+  const [{ result, error }] = await chrome.scripting.executeScript({
     target: {
       tabId: tab.id,
     },
@@ -30,7 +25,7 @@ async function getDescription(tab) {
 }
 
 async function getSelection(tab, html) {
-  const [{ result, error }] = await browser.scripting.executeScript({
+  const [{ result, error }] = await chrome.scripting.executeScript({
     target: {
       tabId: tab.id,
     },
@@ -94,14 +89,14 @@ async function capture(which, url, title, selection) {
   if (selection) {
     data.body = selection;
   }
-  await browser.tabs.update({
+  await chrome.tabs.update({
     url: `org-protocol://${protocol}?${new URLSearchParams(data)}`,
   });
 }
 
 async function storeLink(url, title) {
   const data = { url, title };
-  await browser.tabs.update({
+  await chrome.tabs.update({
     url: `org-protocol://store-link?${new URLSearchParams(data)}`,
   });
 }
@@ -117,7 +112,7 @@ async function autoCapture(tab) {
   return capture(which, tab.url, tab.title, body);
 }
 
-browser.browserAction.onClicked.addListener(async (tab) => {
+chrome.action.onClicked.addListener(async (tab) => {
   const defaultAction = await getSetting("defaultAction");
   switch (defaultAction) {
     case "store":
@@ -129,49 +124,43 @@ browser.browserAction.onClicked.addListener(async (tab) => {
   }
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "capture-selection",
   title: "Capture Selection",
   contexts: ["selection"],
-  icons: icons,
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "capture-media",
   title: "Capture Media",
   contexts: ["audio", "video", "image"],
-  icons: icons,
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "store-link",
   title: "Store Link",
   contexts: ["link"],
-  icons: icons,
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "capture-link",
   title: "Capture Link",
   contexts: ["link"],
-  icons: icons,
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "store-page-link",
   title: "Store Page Link",
-  contexts: ["page", "tab"],
-  icons: icons,
+  contexts: ["page"],
 });
 
-browser.menus.create({
+chrome.contextMenus.create({
   id: "capture-page-link",
   title: "Capture Page Link",
-  contexts: ["page", "tab"],
-  icons: icons,
+  contexts: ["page"],
 });
 
-browser.menus.onClicked.addListener(async (info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   switch (info.menuItemId) {
     case "store-link":
       await storeLink(info.linkUrl, info.linkText);
@@ -197,10 +186,10 @@ browser.menus.onClicked.addListener(async (info, tab) => {
         await capture("media", tab.url, tab.title, info.srcUrl);
         return;
       }
-      await browser.storage.local.set({
+      await chrome.storage.local.set({
         [`_dl.${info.srcUrl}`]: { pageUrl: tab.url, pageTitle: tab.title, mediaUrl: info.srcUrl }
       });
-      await browser.downloads.download({
+      await chrome.downloads.download({
         cookieStoreId: tab.cookieStoreId,
         saveAs: false,
         conflictAction: "uniquify",
@@ -212,8 +201,8 @@ browser.menus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-browser.commands.onCommand.addListener(async (action) => {
-  const [tab] = await browser.tabs.query({ currentWindow: true, active: true });
+chrome.commands.onCommand.addListener(async (action) => {
+  const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
   switch (action) {
     case "store":
       await storeLink(tab.url, tab.title);
@@ -226,43 +215,43 @@ browser.commands.onCommand.addListener(async (action) => {
   }
 });
 
-browser.downloads.onChanged.addListener(async (change) => {
+chrome.downloads.onChanged.addListener(async (change) => {
   // We're looking for newly finished downloads.
   if (change.state.previous == 'complete' || change.state.current != 'complete') {
     return;
   }
 
-  let [dl] = await browser.downloads.search({ id: change.id });
+  let [dl] = await chrome.downloads.search({ id: change.id });
   if (!dl) {
     return;
   }
 
-  if (dl.byExtensionId != browser.runtime.id) {
+  if (dl.byExtensionId != chrome.runtime.id) {
     return;
   }
 
   const key = `_dl.${dl.url}`;
-  const { [key]: metadata } = await browser.storage.local.get(key);
+  const { [key]: metadata } = await chrome.storage.local.get(key);
   if (!metadata) {
     return;
   }
 
   await capture("media", metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
-  await browser.storage.local.remove(key);
+  await chrome.storage.local.remove(key);
 });
 
 (function() {
-  Object.entries(browser.storage.local.get())
+  Object.entries(chrome.storage.local.get())
     .filter(([key, _]) => key.startsWith("_dl."))
     .forEach(async ([k, v]) => {
-      let [dl] = await browser.downloads.search({ url: v.mediaUrl });
+      let [dl] = await chrome.downloads.search({ url: v.mediaUrl });
       if (!dl) {
-        await browser.storage.local.remove(k);
+        await chrome.storage.local.remove(k);
         return;
       }
       if (dl.state == "complete") {
         await capture("media", metadata.pageUrl, metadata.pageTitle, `file:${dl.filename}`);
-        await browser.storage.local.remove(k);
+        await chrome.storage.local.remove(k);
       }
     });
 })();

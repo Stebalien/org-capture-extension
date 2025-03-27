@@ -1,3 +1,5 @@
+import { setSetting, clearSetting } from "./settings.js";
+
 window.addEventListener("DOMContentLoaded", async (_event) => {
   const form = document.getElementById('options');
 
@@ -15,7 +17,7 @@ window.addEventListener("DOMContentLoaded", async (_event) => {
     }
   });
 
-  const settings = await browser.storage.sync.get(
+  const settings = await chrome.storage.sync.get(
     Object.fromEntries(Object.keys(DEFAULTS).map((k) => [k, undefined])),
   );
 

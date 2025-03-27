@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Org Capture",
   "version": "0.3.0",
   "browser_specific_settings": {
@@ -12,21 +12,23 @@
   "homepage_url": "https://github.com/Stebalien/org-capture-extension",
 
   "background": {
-    "persistent": false,
-    "scripts": ["settings.js", "background.js"]
+    "service_worker": "background.js",
+    "type": "module"
   },
 
-  "permissions": ["activeTab", "storage", "scripting", "menus", "downloads", "cookies"],
+  "permissions": ["activeTab", "storage", "scripting", "contextMenus", "downloads", "cookies"],
 
   "options_ui": {
     "page": "options.html"
   },
 
-  "browser_action": {
+  "action": {
     "default_icon": "emacs.svg"
   },
 
   "icons": {
+    "16": "emacs.svg",
+    "32": "emacs.svg",
     "48": "emacs.svg",
     "96": "emacs.svg"
   },
