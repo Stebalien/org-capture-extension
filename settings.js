@@ -23,4 +23,4 @@ async function clearSetting(key) {
   return chrome.storage.sync.remove(key);
 }
 
-export { getSetting, setSetting, clearSetting };
+export { getSetting, setSetting, clearSetting, DEFAULTS };
