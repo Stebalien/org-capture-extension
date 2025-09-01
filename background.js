@@ -85,9 +85,12 @@ async function getSelection(tab, html) {
 async function capture(which, url, title, selection) {
   const template = await getSetting(`${which}CaptureTemplate`);
   const protocol = await getSetting(`${which}CaptureProtocol`);
-  let data = { url, title, template };
+  let data = { url, template };
   if (selection) {
     data.body = selection;
+  }
+  if (title) {
+    data.title = title;
   }
   await chrome.tabs.update({
     url: `org-protocol://${protocol}?${new URLSearchParams(data)}`,
