@@ -24,6 +24,26 @@ async function getDescription(tab) {
   }
 }
 
+async function getActiveLink(tab) {
+  const [{ result, error }] = await chrome.scripting.executeScript({
+    target: {
+      tabId: tab.id,
+    },
+    func: () => {
+      let activeElement = document.activeElement;
+      if (activeElement.tagName !== 'A') {
+        activeElement = activeElement.closest('a');
+      }
+      return activeElement?.innerText;
+    }
+  });
+  if (error) {
+    throw error;
+  } else {
+    return result;
+  }
+}
+
 async function getSelection(tab, html) {
   const [{ result, error }] = await chrome.scripting.executeScript({
     target: {
@@ -163,45 +183,51 @@ chrome.contextMenus.create({
   contexts: ["page"],
 });
 
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  switch (info.menuItemId) {
-    case "store-link":
-      await storeLink(info.linkUrl, info.linkText);
+const contextMenuHandlers = {
+  "store-link": async (info, tab) => {
+    const linkText = info.linkText ?? await getActiveLink(tab);
+    await storeLink(info.linkUrl, linkText);
+  },
+  "store-page-link": async (info, tab) => {
+    await storeLink(tab.url, tab.title);
+  },
+  "capture-selection": async (info, tab) => {
+    const html = await getSetting("captureHtml");
+    const selection = html ? await getSelection(tab, html) : info.selectionText;
+    await capture("selection", tab.url, tab.title, selection, html);
+  },
+  "capture-link": async (info, tab) => {
+    const linkText = info.linkText ?? await getActiveLink(tab);
+    await capture("link", info.linkUrl, linkText, null);
+  },
+  "capture-page-link": async (info, tab) => {
+    const description = await getDescription(tab);
+    await capture("link", tab.url, tab.title, description);
+  },
+  "capture-media": async (info, tab) => {
+    const downloadMedia = await getSetting("downloadMedia");
+    if (!downloadMedia) {
+      await capture("media", tab.url, tab.title, info.srcUrl);
       return;
-    case "store-page-link":
-      await storeLink(tab.url, tab.title);
-      return;
-    case "capture-selection":
-      const html = await getSetting("captureHtml");
-      const selection = html ? await getSelection(tab, html) : info.selectionText;
-      await capture("selection", tab.url, tab.title, selection, html);
-      return;
-    case "capture-link":
-      await capture("link", info.linkUrl, info.linkText, null);
-      return;
-    case "capture-page-link":
-      const description = await getDescription(tab);
-      await capture("link", tab.url, tab.title, description);
-      return;
-    case "capture-media":
-      const downloadMedia = await getSetting("downloadMedia");
-      if (!downloadMedia) {
-        await capture("media", tab.url, tab.title, info.srcUrl);
-        return;
-      }
-      await chrome.storage.local.set({
-        [`_dl.${info.srcUrl}`]: { pageUrl: tab.url, pageTitle: tab.title, mediaUrl: info.srcUrl }
-      });
-      await chrome.downloads.download({
-        cookieStoreId: tab.cookieStoreId,
-        saveAs: false,
-        conflictAction: "uniquify",
-        url: info.srcUrl,
-      });
-      return;
-    default:
-      throw new Error(`unknown menu item ${info.menuItemId}`);
+    }
+    await chrome.storage.local.set({
+      [`_dl.${info.srcUrl}`]: { pageUrl: tab.url, pageTitle: tab.title, mediaUrl: info.srcUrl }
+    });
+    await chrome.downloads.download({
+      cookieStoreId: tab.cookieStoreId,
+      saveAs: false,
+      conflictAction: "uniquify",
+      url: info.srcUrl,
+    });
   }
+};
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  const handler = contextMenuHandlers[info.menuItemId];
+  if (!handler) {
+    throw new Error(`unknown menu item ${info.menuItemId}`);
+  }
+  await handler(info, tab);
 });
 
 chrome.commands.onCommand.addListener(async (action) => {
