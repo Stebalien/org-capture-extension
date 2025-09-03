@@ -6,6 +6,8 @@ const DEFAULTS = {
   mediaCaptureProtocol: "capture",
   linkCaptureTemplate: "l",
   linkCaptureProtocol: "capture",
+  actionCaptureProtocol: "capture",
+  actionCaptureTemplate: "ask",
   defaultAction: "store",
   downloadMedia: true,
 };

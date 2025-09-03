@@ -125,14 +125,35 @@ async function storeLink(url, title) {
 }
 
 async function autoCapture(tab) {
+  let data = { url: tab.url };
+
   const html = await getSetting("captureHtml");
-  let body = await getSelection(tab, html);
-  let which = "selection";
-  if (!body) {
-    which = "link";
-    body = await getDescription(tab);
+  const body = await getSelection(tab, html) || await getDescription(tab);
+  const protocol = await getSetting("actionCaptureProtocol");
+
+  const template = null;
+  switch (await getSetting("actionCaptureTemplate")) {
+  case "ask":
+    break;
+  case "link":
+    template = await getSetting("linkCaptureTemplate");
+    break;
+  case "auto":
+    template = await getSetting(`${body ? "selection" : "link"}CaptureProtocol`);
   }
-  return capture(which, tab.url, tab.title, body);
+
+  if (template) {
+    data.template = template;
+  }
+  if (body) {
+    data.body = body;
+  }
+  if (tab.title) {
+    data.title = tab.title;
+  }
+  await chrome.tabs.update({
+    url: `org-protocol://${protocol}?${new URLSearchParams(data)}`,
+  });
 }
 
 chrome.action.onClicked.addListener(async (tab) => {

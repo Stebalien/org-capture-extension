@@ -1,77 +1,90 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Org Capture Settings</title>
-        <link rel="stylesheet" href="options.css">
-    </head>
+  <head>
+    <title>Org Capture Settings</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
 
-    <body>
-        <form id="options">
-            <fieldset>
-                <legend>General</legend>
-                <label for="defaultAction">Default capture option</label>
-                <select name="defaultAction">
-                    <option value="capture">Capture</option>
-                    <option value="store">Store Link</option>
+  <body>
+    <form id="options">
+      <fieldset>
+        <legend>General</legend>
+        <label for="defaultAction">Default capture option</label>
+        <select name="defaultAction">
+          <option value="capture">Capture</option>
+          <option value="store">Store Link</option>
+        </select>
+      </fieldset>
+      <fieldset>
+        <legend>Templates</legend>
+        <table>
+          <thead>
+            <tr>
+              <td></td>
+              <th>
+                Template
+              </th>
+              <th>
+                Protocol
+              </th>
+              <th>
+                Options
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th> Selection </th>
+              <td>
+                <input name="selectionCaptureTemplate" />
+              </td>
+              <td>
+                <input name="selectionCaptureProtocol" />
+              </td>
+              <td>
+                <input id="captureHtml" name="captureHtml" type="checkbox" />
+                <label for="captureHtml">Capture HTML?</label>
+              </td>
+            </tr>
+            <tr>
+              <th> Link </th>
+              <td>
+                <input name="linkCaptureTemplate">
+              </td>
+              <td>
+                <input name="linkCaptureProtocol">
+              </td>
+            </tr>
+            <tr>
+              <th> Media </th>
+              <td>
+                <input name="mediaCaptureTemplate">
+              </td>
+              <td>
+                <input name="mediaCaptureProtocol">
+              </td>
+              <td>
+                <input id="downloadMedia" name="downloadMedia" type="checkbox" />
+                <label for="downloadMedia">Download media?</label>
+              </td>
+            </tr>
+            <tr>
+              <th> Toolbar Action </th>
+              <td>
+                <select name="actionCaptureTemplate">
+                  <option value="ask">Ask</option>
+                  <option value="auto">Auto (link/selection)</option>
+                  <option value="link">Link Only (ignore selection)</option>
                 </select>
-            </fieldset>
-            <fieldset>
-                <legend>Templates</legend>
-                <table>
-                    <thead>
-                        <tr>
-                            <td></td>
-                            <th>
-                                Template
-                            </th>
-                            <th>
-                                Protocol
-                            </th>
-                            <th>
-                                Options
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th> Selection </th>
-                            <td>
-                                <input name="selectionCaptureTemplate" />
-                            </td>
-                            <td>
-                                <input name="selectionCaptureProtocol" />
-                            </td>
-                            <td>
-                                <input id="captureHtml" name="captureHtml" type="checkbox" />
-                                <label for="captureHtml">Capture HTML?</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th> Link </th>
-                            <td>
-                                <input name="linkCaptureTemplate">
-                            </td>
-                            <td>
-                                <input name="linkCaptureProtocol">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th> Media </th>
-                            <td>
-                                <input name="mediaCaptureTemplate">
-                            </td>
-                            <td>
-                                <input name="mediaCaptureProtocol">
-                            </td>
-                            <td>
-                                <input id="downloadMedia" name="downloadMedia" type="checkbox" />
-                                <label for="downloadMedia">Download media?</label>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-        </form>
-        <script type="module" src="options.js"></script>
-    </body>
+              </td>
+              <td>
+                <input name="actionCaptureProtocol" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+    </form>
+    <script type="module" src="options.js"></script>
+  </body>
 </html>
